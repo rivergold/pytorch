@@ -81,10 +81,13 @@ class TestQuantizedOps(TestCase):
         return output_size
 
     """Tests the correctness of the quantized::relu op."""
-    @given(X=hu.tensor(shapes=hu.array_shapes(1, 5, 1, 5),
-                       qparams=hu.qparams()))
-    def test_qrelu(self, X):
-        X, (scale, zero_point, torch_type) = X
+    @given(qparams=hu.qparams())
+    def test_qrelu(self, qparams):
+        X = np.array([[-3, -2, 1, 2],
+                      [0, 0, 0, 0],
+                      [-5, -4, -3, -2],
+                      [1, 2, 3, 4]], dtype=np.float32)
+        scale, zero_point, torch_type = qparams
 
         Y = X.copy()
         Y[Y < 0] = 0
@@ -95,13 +98,22 @@ class TestQuantizedOps(TestCase):
                                    dtype=torch_type)
 
         ops_under_test = {
-            'ops.quantized': torch.ops.quantized.relu,
             'native': torch.relu,
-            'nn.functional': torch.nn.functional.relu
+            'nn.functional': torch.nn.functional.relu,
         }
 
         for name, op in ops_under_test.items():
             qY_hat = op(qX)
+            self.assertEqual(qY, qY_hat, message="{} relu failed".format(name))
+
+        ops_under_test_inplace = {
+            'inplace native': torch.relu_,
+            'inplace nn.functional': torch.nn.functional.relu_,
+        }
+
+        for name, op in ops_under_test_inplace.items():
+            qY_hat = qX.clone()
+            op_(qY_hat)
             self.assertEqual(qY, qY_hat, message="{} relu failed".format(name))
 
     """Tests the correctness of the add and add_relu op."""
@@ -343,11 +355,11 @@ class TestQuantizedOps(TestCase):
 
     """Tests the correctness of the quantized equal op."""
     @given(X=hu.tensor(shapes=hu.array_shapes(1, 5, 1, 5),
-                    qparams=hu.qparams()),
-        X2=hu.tensor(shapes=hu.array_shapes(1, 5, 1, 5),
+                       qparams=hu.qparams()),
+           X2=hu.tensor(shapes=hu.array_shapes(1, 5, 1, 5),
                         qparams=hu.qparams()),
-        X_per_channel=st.booleans(),
-        X2_per_channel=st.booleans())
+           X_per_channel=st.booleans(),
+           X2_per_channel=st.booleans())
     def test_equal(self, X, X2, X_per_channel, X2_per_channel):
         X, X_params = X
         (scale, zero_point, torch_type) = X_params
@@ -367,7 +379,7 @@ class TestQuantizedOps(TestCase):
         else:
             X_scheme = 'per_tensor'
             qX = torch.quantize_linear(X, scale=scale, zero_point=zero_point,
-                                    dtype=torch_type)
+                                       dtype=torch_type)
         X2 = torch.from_numpy(X2)
         if X2_per_channel:
             X2_scheme = 'per_channel'
