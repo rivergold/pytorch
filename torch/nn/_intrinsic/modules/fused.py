@@ -1,4 +1,8 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import torch
 from torch.nn import Conv2d, ReLU, Linear, BatchNorm2d
 
@@ -25,3 +29,12 @@ class ConvBnReLU2d(torch.nn.Sequential):
         assert type(conv) == Conv2d and type(bn) == BatchNorm2d and \
             type(relu) == ReLU, 'Incorrect types for input modules{}{}{}' \
             .format(type(conv), type(bn), type(relu))
+
+
+class AddReLU(torch.nn.Module):
+    def __init__(self):
+        super(AddReLU, self).__init__()
+
+    def forward(self, a, b):
+        c = torch.add(a, b)
+        return torch.nn.functional.relu(c)
