@@ -395,11 +395,17 @@ def run(paths):
                 assert arguments[-1] == ")", "Expecting closing ) for {}".format(func['func'])
                 arguments = arguments[:-1]  # Expect closing )
                 declaration['name'] = func.get('name', fn_name)
+                print('>>>Debug:', declaration['name'])
                 declaration['operator_name'] = func.get('name', fn_name)
                 declaration['overload_name'] = func.get('overload_name', overload_name)
                 declaration['inplace'] = re.search('(^__i|[^_]_$)', fn_name) is not None
                 return_arguments = parse_return_arguments(return_decl, declaration['inplace'], func)
                 arguments = parse_arguments(arguments, func.get('variants', []), declaration, return_arguments)
+
+                print('>>>Debug return_arguments: {}'.format(return_arguments))
+                print('>>>Debug arguments: {}'.format(arguments))
+
+
                 output_arguments = [x for x in arguments if x.get('output')]
                 propagate_field_names(output_arguments, return_arguments)
                 declaration['return'] = return_arguments if len(output_arguments) == 0 else output_arguments
@@ -419,6 +425,9 @@ def run(paths):
                 declaration['arguments'] = func.get('arguments', arguments)
                 declaration['type_method_definition_dispatch'] = func.get('dispatch', declaration['name'])
                 declaration['python_module'] = func.get('python_module', '')
+
+                print(declaration)
+
                 declarations.append(declaration)
             except Exception as e:
                 msg = '''Exception raised in processing function:

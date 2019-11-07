@@ -1083,7 +1083,7 @@ def create_generic(top_env, declarations):
                     'TensorOptions': 'const TensorOptions &' if const else 'TensorOptions &',
                     'TensorList': 'TensorList',
                 }
-
+            print('>>> argument[\'type\']: {}'.format(argument['type']))
             if argument.get('is_nullable') and argument['type'] not in translate_map(False).keys():
                 argument['type'] = "c10::optional<{}>".format(argument['type'])
 
@@ -1091,7 +1091,7 @@ def create_generic(top_env, declarations):
                 argument['type'] = translate_map(False).get(argument['type'], argument['type'])
             else:
                 argument['type'] = translate_map(True).get(argument['type'], argument['type'])
-
+                print('>>> argument[\'type\']: {}'.format(argument['type']))
             return argument
 
         result = [native_translate_formals(argument, option) for argument in result]
@@ -1446,6 +1446,7 @@ def create_generic(top_env, declarations):
 
     output_declarations = []  # type: List[OutputDeclaration]
     for declaration in declarations:
+        print(declaration)
         output_options = []  # type: List[OutputDeclaration]
         for option in declaration['options']:
             option["matches_jit_signature"] = declaration["matches_jit_signature"]
