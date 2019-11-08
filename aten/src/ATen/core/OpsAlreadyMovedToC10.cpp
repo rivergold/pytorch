@@ -1484,6 +1484,8 @@ bool aten_op_is_not_moved_to_c10_yet(const c10::OperatorName& opName) {
         {"aten::col2im_backward", "grad_input"},
         {"aten::im2col", "out"},
         {"aten::im2col_backward", "grad_input"},
+        {"aten::rivergold_test", ""},
+        {"aten::rivergold_test", "raw"},
     {"", ""}
   };
   return ops.count(std::make_pair(opName.name.c_str(), opName.overload_name.c_str())) != 0;

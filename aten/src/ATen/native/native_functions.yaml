@@ -6836,6 +6836,10 @@
     CPU: im2col_backward_cpu
     CUDA: im2col_backward_cuda
 
-- func: rivergold_test_(Tensor(a!) self) -> void
+- func: rivergold_test(Tensor self, *, Tensor(a!) out) -> Tensor(a!)
+  dispatch:
+    CPU: rivergold_test_out
+
+- func: rivergold_test.raw(Tensor self) -> Tensor
   dispatch:
     CPU: rivergold_test
