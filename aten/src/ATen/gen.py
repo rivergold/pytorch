@@ -414,6 +414,12 @@ def generate_outputs():
     # and modify the declarations to include any information that will all_backends
     # be used by function_wrapper.create_derived
     output_declarations = function_wrapper.create_generic(top_env, declarations)
+
+    # @rivergold: Print top_env
+    import json
+    with open('./memo-top_env.json', 'w') as f:
+        json.dump(top_env, f)
+
     output_declarations = postprocess_output_declarations(output_declarations)
     file_manager.write("Declarations.yaml", format_yaml(output_declarations))
 
